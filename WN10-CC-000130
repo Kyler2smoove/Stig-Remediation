@@ -1,0 +1,72 @@
+<#
+.SYNOPSIS
+    Ensures that the Windows Update service is enabled and running.
+
+.DESCRIPTION
+    This script verifies and enforces that the Windows Update service 
+    (wuauserv) is set to start automatically and is currently running. This is in 
+    compliance with STIG ID WN10-CC-000130.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000130
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000130.ps1
+
+.EXAMPLES
+    Example 1: Running the script to ensure Windows Update is enabled and running
+        PS C:\> .\WN10-CC-000130.ps1
+        ✅ Windows Update service is enabled and running.
+    
+    Example 2: If there is an issue with starting the service
+        PS C:\> .\WN10-CC-000130.ps1
+        ⚠️ Windows Update service could not be started.
+
+#>
+
+# Define the Windows Update service name
+$serviceName = "wuauserv"
+
+try {
+    # Set service startup type to automatic
+    Set-Service -Name $serviceName -StartupType Automatic -ErrorAction Stop
+
+    # Start the service
+    Start-Service -Name $serviceName -ErrorAction Stop
+
+    # Confirm and output the result
+    $service = Get-Service -Name $serviceName
+    if ($service.Status -eq 'Running') {
+        Write-Host "✅ Windows Update service is enabled and running." -ForegroundColor Green
+    } else {
+        Write-Host "⚠️ Windows Update service could not be started." -ForegroundColor Yellow
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Optionally: Ensure that Windows Update is the active service for updates
+$updateStatus = Get-WmiObject -Namespace "root\cimv2" -Class "Win32_Service" | Where-Object { $_.Name -eq "wuauserv" }
+
+if ($updateStatus.Started) {
+    Write-Host "✅ Windows Update service is actively running and ready to install updates." -ForegroundColor Green
+} else {
+    Write-Host "❌ Windows Update service is not actively running." -ForegroundColor Red
+}
