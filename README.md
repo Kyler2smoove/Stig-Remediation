@@ -27,7 +27,8 @@ Each script targets a specific Windows 10 STIG ID and aims to:
 
 | STIG ID           | Description                                                | Script Link |
 |-------------------|------------------------------------------------------------|-------------|
-| `WN10-CC-000600`  | Set Windows Application Event Log Size to Minimum 32MB     | [View Script](https://github.com/Kyler2smoove/Stig-Remediation/blob/main/WN10-CC-000600) |
+| `WN10-CC-000600`  | ensures that Windows Defender SmartScreen is enabled on the system, which helps protect 
+    against phishing and malware websites. This is in compliance with STIG ID WN10-CC-000600.     | [View Script](https://github.com/Kyler2smoove/Stig-Remediation/blob/main/WN10-CC-000600) |
 | _(More coming soon)_ | | |
 
 ---
