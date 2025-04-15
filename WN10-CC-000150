@@ -1,0 +1,61 @@
+<#
+.SYNOPSIS
+    Ensures that User Account Control (UAC) is set to the recommended level.
+
+.DESCRIPTION
+    This script ensures that the User Account Control (UAC) settings are configured to the recommended level of 'Never Notify'.
+    This is in compliance with STIG ID WN10-CC-000150.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000150
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000150.ps1
+
+.EXAMPLES
+    Example 1: Running the script to ensure UAC is set to 'Never Notify'
+        PS C:\> .\WN10-CC-000150.ps1
+        ✅ User Account Control (UAC) is set to the recommended level.
+
+    Example 2: If UAC is already configured correctly
+        PS C:\> .\WN10-CC-000150.ps1
+        ✅ User Account Control (UAC) is already set to the recommended level.
+    
+#>
+
+# Define the registry path for UAC settings
+$registryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+$valueName = "ConsentPromptBehaviorAdmin"
+$desiredValue = 0  # 0 = Never Notify
+
+try {
+    # Check if UAC setting is already at the desired value
+    $currentValue = Get-ItemProperty -Path $registryPath -Name $valueName
+    if ($currentValue.$valueName -ne $desiredValue) {
+        # Set the UAC value to 'Never Notify' (0)
+        Set-ItemProperty -Path $registryPath -Name $valueName -Value $desiredValue -Force
+        Write-Host "✅ UAC setting has been set to 'Never Notify'." -ForegroundColor Green
+    } else {
+        Write-Host "✅ UAC is already set to the recommended level." -ForegroundColor Green
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+
