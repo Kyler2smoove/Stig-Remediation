@@ -1,0 +1,55 @@
+<#
+.SYNOPSIS
+    Ensures that Windows Defender Antivirus Real-Time Protection is enabled.
+
+.DESCRIPTION
+    This script ensures that the Windows Defender Antivirus Real-Time Protection is enabled, which helps 
+    protect the system from malicious threats in real-time. This is in compliance with STIG ID WN10-CC-000250.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000250
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000250.ps1
+
+.EXAMPLES
+    Example 1: Running the script to enable Real-Time Protection
+        PS C:\> .\WN10-CC-000250.ps1
+        ✅ Windows Defender Antivirus Real-Time Protection is enabled.
+
+    Example 2: If Real-Time Protection is already enabled
+        PS C:\> .\WN10-CC-000250.ps1
+        ✅ Real-Time Protection is already enabled.
+
+#>
+
+# Define the registry key for Real-Time Protection
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows Defender\Real-Time Protection"
+$regValue = "DisableRealtimeMonitoring"
+
+try {
+    # Check if Real-Time Protection is enabled
+    $currentValue = Get-ItemProperty -Path $regPath -Name $regValue -ErrorAction SilentlyContinue
+
+    if ($currentValue -and $currentValue.$regValue -eq 0) {
+        Write-Host "✅ Windows Defender Antivirus Real-Time Protection is already enabled." -ForegroundColor Green
+    } else {
+        # Enable Real-Time Protection (set registry value to 0)
+        Set-ItemProperty -Path $regPath -Name $regValue -Value 0
+        Write-Host "✅ Windows
