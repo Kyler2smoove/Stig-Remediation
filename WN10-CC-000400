@@ -1,0 +1,69 @@
+<#
+.SYNOPSIS
+    Ensures that Windows Update is enabled and configured to automatically download and install updates.
+
+.DESCRIPTION
+    This script ensures that Windows Update is enabled, and that updates are set to automatically 
+    download and install on the system. This is in compliance with STIG ID WN10-CC-000400.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000400
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000400.ps1
+
+.EXAMPLES
+    Example 1: Running the script to ensure Windows Update is enabled and configured for automatic updates
+        PS C:\> .\WN10-CC-000400.ps1
+        ✅ Windows Update is enabled and configured for automatic updates.
+
+    Example 2: If Windows Update is already enabled
+        PS C:\> .\WN10-CC-000400.ps1
+        ✅ Windows Update is already enabled and configured.
+
+#>
+
+# Enable Windows Update service
+$serviceName = "wuauserv"
+
+try {
+    # Check if Windows Update service is running
+    $serviceStatus = Get-Service -Name $serviceName
+
+    if ($serviceStatus.Status -ne 'Running') {
+        # Start the service if it's not running
+        Start-Service -Name $serviceName
+        Write-Host "✅ Windows Update service started." -ForegroundColor Green
+    } else {
+        Write-Host "✅ Windows Update service is already running." -ForegroundColor Green
+    }
+
+    # Set Windows Update to automatic startup
+    Set-Service -Name $serviceName -StartupType Automatic
+
+    # Configure Windows Update to automatically download and install updates
+    $wuSettings = New-Object -ComObject Microsoft.Update.AutoUpdate
+    $wuSettings.Settings.NotificationLevel = 2  # 2 = Notify to download and install
+    $wuSettings.Settings.Save()
+
+    Write-Host "✅ Windows Update is now set to automatically download and install updates." -ForegroundColor Green
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
