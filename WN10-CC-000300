@@ -1,0 +1,60 @@
+<#
+.SYNOPSIS
+    Ensures that the Windows Firewall is enabled.
+
+.DESCRIPTION
+    This script ensures that the Windows Firewall is enabled and set to the appropriate
+    configuration as per STIG ID WN10-CC-000300.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000300
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000300.ps1
+
+.EXAMPLES
+    Example 1: Running the script to enable Windows Firewall
+        PS C:\> .\WN10-CC-000300.ps1
+        ✅ Windows Firewall is enabled and running.
+    
+    Example 2: If the firewall was already enabled
+        PS C:\> .\WN10-CC-000300.ps1
+        ✅ Windows Firewall is already enabled.
+
+#>
+
+# Define the Windows Firewall service name
+$firewallServiceName = "MpsSvc"
+
+try {
+    # Check the status of the firewall service
+    $firewallService = Get-Service -Name $firewallServiceName
+
+    # Enable the service and set it to automatic if it isn't already
+    if ($firewallService.Status -ne 'Running') {
+        Set-Service -Name $firewallServiceName -StartupType Automatic -ErrorAction Stop
+        Start-Service -Name $firewallServiceName -ErrorAction Stop
+        Write-Host "✅ Windows Firewall is enabled and running." -ForegroundColor Green
+    } else {
+        Write-Host "✅ Windows Firewall is already enabled and running." -ForegroundColor Green
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
