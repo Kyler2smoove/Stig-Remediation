@@ -1,0 +1,60 @@
+<#
+.SYNOPSIS
+    Ensures that Windows Update is enabled and configured.
+
+.DESCRIPTION
+    This script ensures that the Windows Update service is set to automatic and running,
+    and that the Windows Update service is enabled. This is in compliance with STIG ID WN10-CC-000100.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000100
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000100.ps1
+
+.EXAMPLES
+    Example 1: Running the script to ensure Windows Update is enabled and running
+        PS C:\> .\WN10-CC-000100.ps1
+        ✅ Windows Update service is enabled and running.
+
+    Example 2: If Windows Update was already enabled
+        PS C:\> .\WN10-CC-000100.ps1
+        ✅ Windows Update service is already enabled and running.
+
+#>
+
+# Define the Windows Update service name
+$updateServiceName = "wuauserv"
+
+try {
+    # Check the status of the Windows Update service
+    $updateService = Get-Service -Name $updateServiceName
+
+    # Enable the service and set it to automatic if it isn't already
+    if ($updateService.Status -ne 'Running') {
+        Set-Service -Name $updateServiceName -StartupType Automatic -ErrorAction Stop
+        Start-Service -Name $updateServiceName -ErrorAction Stop
+        Write-Host "✅ Windows Update service is enabled and running." -ForegroundColor Green
+    } else {
+        Write-Host "✅ Windows Update service is already enabled and running." -ForegroundColor Green
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
