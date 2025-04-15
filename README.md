@@ -27,7 +27,7 @@ Each script targets a specific Windows 10 STIG ID and aims to:
 
 | STIG ID           | Description                                                | Script Link |
 |-------------------|------------------------------------------------------------|-------------|
-| `WN10-AU-000500`  | Set Windows Application Event Log Size to Minimum 32MB     | [View Script](./WN10-AU-000500/WN10-AU-000500.ps1) |
+| `WN10-CC-000600`  | Set Windows Application Event Log Size to Minimum 32MB     | [View Script](https://github.com/Kyler2smoove/Stig-Remediation/blob/main/WN10-CC-000600) |
 | _(More coming soon)_ | | |
 
 ---
@@ -42,4 +42,4 @@ Each folder contains:
 
 Example:
 ```powershell
-.\WN10-AU-000500.ps1
+.\WN10-CC-000600.ps1
