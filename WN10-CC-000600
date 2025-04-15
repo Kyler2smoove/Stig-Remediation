@@ -1,0 +1,61 @@
+<#
+.SYNOPSIS
+    Ensures that Windows Defender SmartScreen is enabled.
+
+.DESCRIPTION
+    This script ensures that Windows Defender SmartScreen is enabled on the system, which helps protect 
+    against phishing and malware websites. This is in compliance with STIG ID WN10-CC-000600.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000600
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000600.ps1
+
+.EXAMPLES
+    Example 1: Running the script to enable Windows Defender SmartScreen
+        PS C:\> .\WN10-CC-000600.ps1
+        ✅ Windows Defender SmartScreen is enabled.
+
+    Example 2: If Windows Defender SmartScreen is already enabled
+        PS C:\> .\WN10-CC-000600.ps1
+        ✅ Windows Defender SmartScreen is already enabled.
+
+#>
+
+# Enable Windows Defender SmartScreen
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"
+$regValue = "SmartScreenEnabled"
+$desiredValue = "RequireAdmin"
+
+try {
+    # Check if SmartScreen is already enabled
+    $currentValue = Get-ItemProperty -Path $regPath -Name $regValue -ErrorAction SilentlyContinue
+
+    if ($currentValue -and $currentValue.$regValue -eq $desiredValue) {
+        Write-Host "✅ Windows Defender SmartScreen is already enabled." -ForegroundColor Green
+    } else {
+        # Set SmartScreen to 'RequireAdmin' (enables SmartScreen)
+        Set-ItemProperty -Path $regPath -Name $regValue -Value $desiredValue
+        Write-Host "✅ Windows Defender SmartScreen is now enabled." -ForegroundColor Green
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
