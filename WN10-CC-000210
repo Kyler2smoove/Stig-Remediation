@@ -1,0 +1,70 @@
+<#
+.SYNOPSIS
+    Ensures that Windows Defender Antivirus real-time protection is enabled.
+
+.DESCRIPTION
+    This script ensures that Windows Defender Antivirus real-time protection 
+    (antivirus real-time monitoring) is enabled, which is a requirement of 
+    STIG ID WN10-CC-000210.
+
+.NOTES
+    Author          : Kyler Williams
+    LinkedIn        : www.linkedin.com/in/kylerwilliams24
+    GitHub          : https://github.com/Kyler2smoove
+    Date Created    : 2025-04-14
+    Last Modified   : 2025-04-14
+    Version         : 1.0
+    CVEs            : N/A
+    Plugin IDs      : N/A
+    STIG-ID         : WN10-CC-000210
+
+.TESTED ON
+    Date(s) Tested  : 2025-04-14
+    Tested By       : Kyler Williams
+    Systems Tested  : Windows 10 (Azure VM)
+    PowerShell Ver. : 5.1
+
+.USAGE
+    Run this script in PowerShell with administrative privileges:
+
+    PS C:\> .\WN10-CC-000210.ps1
+
+.EXAMPLES
+    Example 1: Running the script to enable Windows Defender real-time protection
+        PS C:\> .\WN10-CC-000210.ps1
+        ✅ Windows Defender real-time protection is enabled.
+    
+    Example 2: If there is an issue with enabling the protection
+        PS C:\> .\WN10-CC-000210.ps1
+        ⚠️ Windows Defender real-time protection could not be enabled.
+
+#>
+
+# Define the registry path for real-time protection setting
+$regPath = "HKLM:\SOFTWARE\Microsoft\Windows Defender\Real-Time Protection"
+$regValue = "DisableRealtimeMonitoring"
+
+try {
+    # Ensure real-time protection is enabled
+    Set-ItemProperty -Path $regPath -Name $regValue -Value 0 -Force -ErrorAction Stop
+
+    # Confirm and output the result
+    $currentStatus = Get-ItemProperty -Path $regPath -Name $regValue
+    if ($currentStatus.DisableRealtimeMonitoring -eq 0) {
+        Write-Host "✅ Windows Defender real-time protection is enabled." -ForegroundColor Green
+    } else {
+        Write-Host "⚠️ Windows Defender real-time protection could not be enabled." -ForegroundColor Yellow
+    }
+}
+catch {
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+# Optional: Check if real-time protection is running
+$defenderStatus = Get-WmiObject -Namespace "root\cimv2" -Class "Win32_Service" | Where-Object { $_.Name -eq "WinDefend" }
+
+if ($defenderStatus.State -eq "Running") {
+    Write-Host "✅ Windows Defender Antivirus service is actively running." -ForegroundColor Green
+} else {
+    Write-Host "❌ Windows Defender Antivirus service is not running." -ForegroundColor Red
+}
